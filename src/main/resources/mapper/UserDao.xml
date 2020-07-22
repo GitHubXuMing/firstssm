@@ -5,31 +5,66 @@
     <constructor >
       <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
       <arg column="username" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="password" jdbcType="VARCHAR" javaType="java.lang.String" />
       <arg column="sal" jdbcType="DECIMAL" javaType="java.math.BigDecimal" />
-      <arg column="birth" jdbcType="DATE" javaType="java.util.Date" />
+      <arg column="url" jdbcType="VARCHAR" javaType="java.lang.String" />
     </constructor>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, username, sal, birth
+    id, username, password, sal, url
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    from t_user
+    from user
     where id = #{id,jdbcType=INTEGER}
   </select>
+
+  <select id="exist" parameterType="map" resultType="integer">
+      select count(1) from user where username=#{username}
+  </select>
+
+  <select id="login" parameterType="map" resultType="com.company.ssm.dao.entity.User">
+    select id,username,sal,url from user where username=#{username} and password=#{password}
+  </select>
+  <select id="findAll" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from user
+  </select>
+
+  <select id="dynamicSearch" parameterType="com.company.ssm.vo.QueryVo" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List"/> from user
+    <where>
+      <if test="id != null and id != ''">
+        and id = #{id}
+      </if>
+      <if test="username != null and username != ''">
+        and username like concat('%', #{username},'%')
+      </if>
+      <if test="minSal != null and minSal != ''">
+        and sal&gt;#{minSal}
+      </if>
+      <if test="maxSal != null and maxSal != ''">
+        and sal&lt;#{maxSal}
+      </if>
+    </where>
+  </select>
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from t_user
+    delete from user
     where id = #{id,jdbcType=INTEGER}
   </delete>
+
+
+
   <insert id="insert" parameterType="com.company.ssm.dao.entity.User" >
-    insert into t_user (id, username, sal, 
-      birth)
-    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{sal,jdbcType=DECIMAL}, 
-      #{birth,jdbcType=DATE})
+    insert into user (id, username, password, 
+      sal, url)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{sal,jdbcType=DECIMAL}, #{url,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.company.ssm.dao.entity.User" >
-    insert into t_user
+    insert into user
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
@@ -37,11 +72,14 @@
       <if test="username != null" >
         username,
       </if>
+      <if test="password != null" >
+        password,
+      </if>
       <if test="sal != null" >
         sal,
       </if>
-      <if test="birth != null" >
-        birth,
+      <if test="url != null" >
+        url,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -51,34 +89,41 @@
       <if test="username != null" >
         #{username,jdbcType=VARCHAR},
       </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
       <if test="sal != null" >
         #{sal,jdbcType=DECIMAL},
       </if>
-      <if test="birth != null" >
-        #{birth,jdbcType=DATE},
+      <if test="url != null" >
+        #{url,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.company.ssm.dao.entity.User" >
-    update t_user
+    update user
     <set >
       <if test="username != null" >
         username = #{username,jdbcType=VARCHAR},
       </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
       <if test="sal != null" >
         sal = #{sal,jdbcType=DECIMAL},
       </if>
-      <if test="birth != null" >
-        birth = #{birth,jdbcType=DATE},
+      <if test="url != null" >
+        url = #{url,jdbcType=VARCHAR},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.company.ssm.dao.entity.User" >
-    update t_user
+    update user
     set username = #{username,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
       sal = #{sal,jdbcType=DECIMAL},
-      birth = #{birth,jdbcType=DATE}
+      url = #{url,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>
