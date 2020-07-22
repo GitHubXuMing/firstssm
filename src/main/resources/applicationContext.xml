@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--配置了Spring框架的IOC容器，实现对指定目录的自动扫描
+        凡是使用了@Service,@Repository,@Controller,@Component等注解的类，将被自动生成对象
+        放入到Spring的IOC容器中
+    -->
+    <context:component-scan base-package="com.company.ssm"/>
+
+    <!--导入配置了mybatis相关信息的配置文件-->
+    <import resource="classpath:mybatis/spring-datasource.xml"/>
+    <!--结合Dao层框架（MyBatis）,实现基于AOP特性的事务管理
+        @Transactional 隔离性 READ_COMMITED   事务传播机制  REQUIRED   只读
+    -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>
