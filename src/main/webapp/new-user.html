@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>新增用户页面</title>
+		<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css" />
+		<style type="text/css">
+			#successMsg,
+			#errMsg {
+				display: none;
+			}
+		</style>
+	</head>
+
+	<body>
+		<h3>请填写用户信息</h3>
+		<table>
+			<tr>
+				<td>用户名</td>
+				<td><input type="text" value="user001" id="username" />
+					<span id="successMsg"><i class="fa fa-check-circle" style="color: greenyellow;" aria-hidden="true"></i></span>
+					<span id="errMsg"></span>
+				</td>
+			</tr>
+			<tr>
+				<td>密码</td>
+				<td><input type="password" value="123456" id="pwd1" /></td>
+			</tr>
+			<tr>
+				<td>确认密码</td>
+				<td>
+					<input type="password" value="123456" id="pwd2" />
+					<span id="msg" style="color: red;"></span>
+				</td>
+			</tr>
+			<tr>
+				<td>工资</td>
+				<td><input type="text" value="6000" id="sal" /></td>
+			</tr>
+			<tr>
+				<td>
+					<a href="javascript:void(0)" id="regBtn">注册</a>
+				</td>
+			</tr>
+		</table>
+
+		<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				//1-校验用户名长度不能超过20，且不能与数据库中已有用户名重名
+				$("#username").blur(function() {
+					if($("#username").val().trim().length > 20) {
+						$("#errMsg").html("用户名长度超过20个字符").css({
+							"display": "inline",
+							"color": "red",
+							"font-size": "12px"
+						});
+					} else {
+						$.ajax({
+							type: "post",
+							url: "http://localhost:8080/user/existServlet",
+							data: {
+								username: $("#username").val().trim()
+							},
+							success: function(response) {
+                                var res = response;
+								if(res.status == 201) {
+									$("#successMsg").css("display", "inline");
+									$("#errMsg").css("display", "none");
+								} else {
+									$("#successMsg").css("display", "none");
+									$("#errMsg").css("display", "block");
+									$("#errMsg").html(res.msg).css({
+										"color": "red"
+									});
+								}
+							}
+						});
+					}
+				});
+
+				$("#regBtn").click(function(ev) {
+					//2-密码两次一致
+					if($("#pwd1").val() != $("#pwd2").val()) {
+						$("#msg").html("密码不一致");
+						$("#pwd2").val("");
+						$("#pwd1").val("").focus();
+					} else if(parseFloat($("#sal").val()) < 0 || parseFloat($("#sal").val()) > 99999) {
+						$("#msg").html("薪资赋值范围0-99999");
+						$("#sal").val("").focus();
+					} else {
+						$("#msg").html("");
+						//3-发送ajax请求，实现注册功能，并根据返回值，决定跳转逻辑
+						$.ajax({
+							type: "post",
+							url: "http://localhost:8080/user",
+							data: {
+								username: $("#username").val().trim(),
+								password: $("#pwd2").val(),
+								sal:$("#sal").val()
+							},
+							success: function(response) {
+                                var res = response;
+								if(res.status == 200) {
+									window.location.href = "http://localhost:8080/list-users.html"
+								} else {
+									alert(res.msg);
+								}
+							}
+						});
+					}
+
+				})
+
+			});
+		</script>
+	</body>
+
+</html>

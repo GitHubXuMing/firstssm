@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<title>login</title>
+<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+<link rel="stylesheet" type="text/css" href="css/demo.css" />
+<link rel="stylesheet" type="text/css" href="css/component.css" />
+<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css"/>
+<style type="text/css">
+	#successMsg,#errMsg{
+		display: none;
+	}
+</style>
+</head>
+<body>
+		<div class="container demo-1">
+			<div class="content">
+				<div id="large-header" class="large-header">
+					<canvas id="demo-canvas"></canvas>
+					<div class="logo_box">
+						<h3>麦思管理系统</h3>
+						<div class="input_outer">
+							<span class="u_user"></span>
+							<input id="username" name="username" class="text" style="color: #FFFFFF !important" type="text" placeholder="请输入用户">
+							<span id="successMsg"><i class="fa fa-check-circle" style="color: greenyellow;" aria-hidden="true"></i></span>
+							<span id="errMsg"></span>
+						</div>
+						<div class="input_outer">
+							<span class="us_uer"></span>
+							<input id="password" name="password" class="text" style="color: #FFFFFF !important; position:absolute; z-index:100;"value="" type="password" placeholder="请输入密码">
+						</div>
+						<div class="mb2"><a id="loginBtn" href="javascript:void(0)" class="act-but submit" style="color: #FFFFFF">登录</a></div>
+						<div class="mb2"><a   href="http://localhost:8080/user-reg.html" class="act-but submit" style="color: #FFFFFF">注册</a></div>
+						<p id="msg" style="color:yellow"></p>
+					</div>
+				</div>
+			</div>
+		</div><!-- /container -->
+		<script src="js/TweenLite.min.js"></script>
+		<script src="js/EasePack.min.js"></script>
+		<script src="js/rAF.js"></script>
+		<script src="js/demo-1.js"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(function(){
+				//2-实现登录功能
+				$("#loginBtn").click(function(ev){
+					$.ajax({
+						url:"http://localhost:8080/user/login",
+						type:"post",
+						data:{
+							username:$("#username").val(),
+							password:$("#password").val()
+						},
+						success:function(res){
+							console.log(res.status);
+							if(res.status == 200){
+							    sessionStorage.setItem("username",res.data.username);
+								window.location.href = "http://localhost:8080/router.html";
+							}else{
+								$("#msg").html(res.msg);
+							}
+						}
+					});
+				});
+				
+				//1-实现用户名是否存在的校验
+				$("#username").focus().blur(function(ev){
+					if($(this).val().trim() == ""){
+						$("#successMsg").css("display","none");
+						$("#errMsg").css("display","block");
+						$("#errMsg").html("用户名不能为空").css({"color":"yellow"});
+					}else{
+						$.ajax({
+							url:"http://localhost:8080/user/"+$("#username").val().trim(),
+							type:"post",
+							success:function(response){
+								if(response.status == 202){
+									$("#successMsg").css("display","inline");
+									$("#errMsg").css("display","none");
+								}else{
+									$("#successMsg").css("display","none");
+									$("#errMsg").css("display","block");
+									$("#errMsg").html(response.msg).css({"color":"yellow"});
+								}
+							}
+						});
+					}
+				});				
+			});
+		</script>
+		<div style="text-align:center;">
+</div>
+	</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>用户信息详情页</title>
+	</head>
+
+	<body>
+		<h3>更新用户信息</h3>
+		<table>
+			<tr>
+				<td>用户编号</td>
+				<td>
+					<input type="text" id="id" />
+				</td>
+			</tr>
+			<tr>
+				<td>用户名</td>
+				<td><input type="text" id="username" /></td>
+			</tr>
+			<tr>
+				<td>密码</td>
+				<td><input type="password" id="password" /></td>
+			</tr>
+			<tr>
+				<td>余额</td>
+				<td><input type="text" id="sal" /></td>
+			</tr>
+			<tr>
+				<td>头像</td>
+				<td><a href="javascript:void(0)" id="uploadBtn">上传头像</a></td>
+			</tr>
+			<tr>
+				<td>
+					<a href="javascript:void(0)" id="updateBtn">更新</a>
+				</td>
+				<td></td>
+			</tr>
+		</table>
+		<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				$.ajax({
+					type: "get",
+					url: "http://localhost:8080/user/"+sessionStorage.id,
+					success: function(response) {
+                        var res = response;
+						if(res.status == 200) {
+							var user = res.data;
+							$("#id").val(user.id);
+							$("#username").val(user.username);
+							$("#password").val(user.password);
+							$("#sal").val(user.sal);
+						} else {
+							alert(res.msg);
+							window.location.href = "http://localhost:8080/list-users.html";
+						}
+					}
+				});
+
+				$("#uploadBtn").click(function(){
+				    alert(sessionStorage.getItem("username"));
+				    window.location.href = "http://localhost:8080/uploadFile.html"
+				});
+
+				$("#updateBtn").click(function() {
+					var flag = confirm("确认更新吗？");
+					if(flag) {
+						$.ajax({
+							type: "post",
+							url: "http://localhost:8080/newuser",
+							data: {
+								id: $("#id").val(),
+								username: $("#username").val(),
+								password: $("#password").val(),
+								sal: $("#sal").val()
+							},
+							success: function(res) {
+								if(res.status == 200) {
+									window.location.href = "http://localhost:8080/list-users.html";
+								} else {
+									alert(res.msg);
+								}
+							}
+						});
+					}
+				})
+			});
+		</script>
+	</body>
+
+</html>

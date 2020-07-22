@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>头像上传</title>
+</head>
+<body>
+    <form action="http://localhost:8080/upload.do" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="username" id="username">
+        <input type="file" name="fileFromClient">
+        <input type="submit" value="form上传">
+    </form>
+    <hr/>
+    <input type="file" id="uploadFile">
+    <div>
+        <img id="pic">
+    </div>
+    <button id="ajaxUploadBtn">ajax上传</button>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function(){
+            $("#username").val(sessionStorage.getItem("username"));//form
+            //ajax
+            $("#ajaxUploadBtn").click(function(){
+                var formData = new FormData();
+                formData.append("fileFromClient", $("#uploadFile")[0].files[0]);
+                formData.append("username",sessionStorage.getItem("username"));
+                $.ajax({
+                    type:"post",
+                    url: "http://localhost:8080/upload.do",
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    async: false,
+                    cache: false,
+                    dataType: "json",
+                    mimeType: "multipart/form-data",
+                    success:function(res){
+                        console.log(JSON.stringify(res));
+                        if(res.status == 200){
+                            $("#pic").attr("src","http://localhost:8080"+res.data).css({
+                                width:"200px",
+                                height:"200px"
+                            });
+                        }else{
+                            alert("上传失败");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

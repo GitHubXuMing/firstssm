@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>用户信息页面</title>
+	</head>
+
+	<body>
+		<h3>欢迎 </h3> 编号:
+
+		<input type="text" id="id" placeholder="根据编号精确查询" /> 用户名：
+		<input type="text" value="t" id="username" placeholder="根据姓名模糊查询" /> 余额范围：
+		<input type="number" value="5000" id="minSal" />--<input type="number" value="15000" id="maxSal" />
+		<a href="javascript:void(0)" id="queryBtn">动态查询</a>
+		<br/>
+		<a href="http://localhost:8080/new-user.html">新增一个用户</a>
+		<br/>
+		<br/>
+		<table id="users">
+			<tr>
+				<td>编号</td>
+				<td>用户名</td>
+				<td>密码</td>
+				<td>余额</td>
+				<td>操作</td>
+			</tr>
+		</table>
+		<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script>
+			$(function() {
+				$.ajax({
+					type: "get",
+					url: "http://localhost:8080/users",
+					success: function(response) {
+                        var res = response;
+						if(res.status == 200) {
+						    alert("共有记录："+res.data.total+"条");
+							var users = res.data.list;
+							for(var i in users) {
+								var user = users[i];
+								$("#users").append(
+									$("<tr></tr>")
+									.append($("<td></td>").text(user.id))
+									.append($("<td></td>").text(user.username))
+									.append($("<td></td>").text(user.password))
+									.append($("<td></td>").text(user.sal))
+									.append(
+										$("<td></td>")
+										.append($("<a></a>").text("删除").attr({
+											id: user.id,
+											name: "delBtn",
+											href: "javascript:void(0)"
+										}))
+										.append($("<a></a>").text("更新").attr({
+											id: user.id,
+											name: "updateBtn",
+											href: "javascript:void(0)"
+										}))
+									)
+								);
+							}
+						} else if(res.status == 510) {
+							alert(res.status + ":" + res.msg);
+						} else {
+							window.location.href = "http://localhost:8080/error.html";
+						}
+					}
+				});
+
+				//当需要在追加节点上添加事件时，我们要想到事件捕获
+				$("#users").on("click", function(ev) {
+					if(ev.target.name == "delBtn") {
+						var flag = confirm("确认删除第" + ev.target.id + "条数据吗？");
+						if(flag) {
+							$.ajax({
+								type: "delete",
+								url: "http://localhost:8080/user/"+ev.target.id,
+								success: function(response) {
+                                    var res = response;
+									if(res.status == 200) {
+										window.location.href = "http://localhost:8080/list-users.html?q="+Math.random();
+									} else {
+										alert(res.msg);
+										window.location.href = "http://localhost:8080/list-users.html?q="+Math.random();
+									}
+								}
+							});
+						}
+					} else if(ev.target.name == "updateBtn") {
+						sessionStorage.setItem("id",ev.target.id);
+						window.location.href="http://localhost:8080/update.html";
+					}
+				});
+			
+				$("#queryBtn").click(function(ev){
+					$.ajax({
+						type:"get",
+						url:"http://localhost:8080/dyusers",
+						data:{
+							id:$("#id").val(),
+							username:$("#username").val(),
+							minSal:$("#minSal").val(),
+							maxSal:$("#maxSal").val()
+						},
+						success:function(response){
+                            var res = response;
+							if(res.status == 200){
+								$("#users").empty()
+								.append(
+									$("<tr></tr>")
+									.append($("<td></td>").text("编号"))
+									.append($("<td></td>").text("用户名"))
+									.append($("<td></td>").text("密码"))
+									.append($("<td></td>").text("工资"))
+									.append($("<td></td>").text("操作"))
+								);
+								var users = res.data;
+								for(var i in users){
+									var user = users[i];
+									$("#users").append(
+									$("<tr></tr>")
+									.append($("<td></td>").text(user.id))
+									.append($("<td></td>").text(user.username))
+									.append($("<td></td>").text(user.password))
+									.append($("<td></td>").text(user.sal))
+									.append(
+										$("<td></td>")
+										.append($("<a></a>").text("删除").attr({
+											id: user.id,
+											name: "delBtn",
+											href: "javascript:void(0)"
+										}))
+										.append($("<a></a>").text("更新").attr({
+											id: user.id,
+											name: "updateBtn",
+											href: "javascript:void(0)"
+										}))
+									)
+								)
+								}
+							}else{
+								alert(res.msg);
+							}
+						}
+					});
+				});
+			});
+		</script>
+	</body>
+
+</html>
