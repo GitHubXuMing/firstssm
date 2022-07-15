@@ -32,7 +32,7 @@
         <!--mysql驱动版本号-->
         <mysql.version>5.1.38</mysql.version>
         <!--jackson json转换工具-->
-        <jackson.version>2.9.7</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
         <fastjson.version>1.2.72</fastjson.version>
         <!--日志打印-->
         <slf4j.version>1.7.25</slf4j.version>
